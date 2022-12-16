@@ -1,0 +1,35 @@
+version: '3'
+
+services:
+    nginx:
+        container_name: sfera_nginx
+        image: nginx:latest
+        volumes:
+            - ./:/var/www
+            - ./_docker/nginx/conf.d:/etc/nginx/conf.d
+        ports:
+            - 8875:80
+        depends_on:
+            - app
+    app:
+        container_name: sfera_app
+        build:
+            context: .
+            dockerfile: _docker/app/Dockerfile
+        volumes:
+            - ./:/var/www
+        depends_on:
+            - db
+    db:
+        container_name: sfera_db
+        image: postgres:14-alpine
+        volumes:
+            - ./postgres_data:/var/lib/postgresql/data/
+        ports:
+            - 5432:5432
+        environment:
+            - POSTGRES_PASSWORD=root
+            - POSTGRES_USER=admin
+        restart: always
+
+
